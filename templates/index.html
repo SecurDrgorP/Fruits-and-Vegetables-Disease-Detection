@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fruit Disease Detector | AI Analysis Tool</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='css/styles.css') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+</head>
+<body>
+    <!-- App wrapper -->
+    <div class="app-wrapper">
+        <!-- Side panel - fixed on desktop, collapsible on mobile -->
+        <aside class="side-panel">
+            <div class="panel-header">
+                <div class="app-logo">
+                    <span class="logo-icon">🍎</span>
+                    <h1>Fruit Scanner</h1>
+                </div>
+                <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+            
+            <nav class="panel-nav">
+                <div class="nav-section active">
+                    <span class="nav-icon">📷</span>
+                    <span>Analyze</span>
+                </div>
+                <div class="nav-section">
+                    <span class="nav-icon">📊</span>
+                    <span>History</span>
+                </div>
+                <div class="nav-section">
+                    <span class="nav-icon">📚</span>
+                    <span>Disease Guide</span>
+                </div>
+                <div class="nav-section">
+                    <span class="nav-icon">⚙️</span>
+                    <span>Settings</span>
+                </div>
+            </nav>
+            
+            <div class="panel-footer">
+                <p>AI-powered pathology detection</p>
+                <small>© 2025 Fruit Scanner</small>
+            </div>
+        </aside>
+        
+        <!-- Main content -->
+        <main class="main-content">
+            <header class="page-header">
+                <h2>Fruit Disease Analysis</h2>
+                <p>Upload an image to detect diseases and nutritional deficiencies</p>
+            </header>
+            
+            <!-- Upload container -->
+            <section class="upload-container card">
+                <form id="uploadForm" action="/" method="post" enctype="multipart/form-data">
+                    <div class="upload-zone" id="uploadZone">
+                        <input type="file" id="fileInput" name="file" accept="image/*" required>
+                        <div class="upload-content">
+                            <div class="upload-icon">
+                                <svg viewBox="0 0 24 24" width="48" height="48" stroke="currentColor" fill="none" stroke-width="1.5">
+                                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                            </div>
+                            <h3>Drop your image here</h3>
+                            <p>or <span class="upload-browse">browse</span> to choose a file</p>
+                            <div class="file-info" id="fileInfo"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="model-selector">
+                        <label for="modelSelect">Select AI Model:</label>
+                        <div class="select-wrapper">
+                            <select id="modelSelect" name="model">
+                                {% for model in models %}
+                                    <option value="{{ model }}">{{ model }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <small>Choose the model specialized for your fruit type</small>
+                    </div>
+                    
+                    <button type="submit" class="analyze-button">
+                        <span>Analyze Image</span>
+                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="16"></line>
+                            <line x1="8" y1="12" x2="16" y2="12"></line>
+                        </svg>
+                    </button>
+                </form>
+            </section>
+            
+            <!-- Results container - hidden initially -->
+            <section class="results-container" id="resultsContainer" {% if not result %}style="display: none;"{% endif %}>
+                <div class="results-header">
+                    <h3>Analysis Results</h3>
+                    <div class="view-controls">
+                        <button class="view-btn active" id="btnOriginal">Original</button>
+                        <button class="view-btn" id="btnHeatmap">Heatmap</button>
+                    </div>
+                </div>
+                
+                <div class="results-grid">
+                    <div class="image-card card">
+                        <div class="image-container" id="imageContainer">
+                            <img id="resultImage" src="{{ image_data if image_data else '#' }}" 
+                                {% if heatmap_data %}data-heatmap="{{ heatmap_data }}"{% endif %} 
+                                alt="Analyzed image">
+                        </div>
+                        <div class="heatmap-info">
+                            <div class="info-icon">ℹ️</div>
+                            <p>Heatmap shows areas the AI focused on. Red regions had the strongest influence on the diagnosis.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="details-card card">
+                        <div class="diagnosis-result" id="diagnosisResult">
+                            <h4>Diagnosis:</h4>
+                            <div class="diagnosis-status">{{ result if result else 'Healthy' }}</div>
+                        </div>
+                        
+                        <div class="confidence-meter">
+                            <h4>Confidence Level:</h4>
+                            <div class="meter-bar">
+                                <div class="meter-fill" style="width: {{ confidence if confidence else '85' }}%"></div>
+                            </div>
+                            <span class="meter-value">{{ confidence if confidence else '85' }}%</span>
+                        </div>
+                        
+                        <div class="file-details">
+                            <h4>File Information:</h4>
+                            <ul>
+                                <li><span>Name:</span> <span id="fileName">{{ file_name if file_name else 'No file selected' }}</span></li>
+                                <li><span>Size:</span> <span id="fileSize">{{ file_size if file_size else '---' }}</span></li>
+                                <li><span>Type:</span> <span id="fileType">{{ file_type if file_type else '---' }}</span></li>
+                            </ul>
+                        </div>
+                        
+                        <div class="action-buttons">
+                            <button class="btn-download" id="btnDownload" {% if not image_data %}disabled{% endif %}>
+                                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none">
+                                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
+                                    <polyline points="7 10 12 15 17 10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
+                                Download
+                            </button>
+                            <button class="btn-new-scan" id="btnNewScan">New Scan</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Loading indicator -->
+            <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+                <div class="loader-content">
+                    <div class="spinner"></div>
+                    <p>Analyzing your image...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', path='js/scripts.js') }}"></script>
+</body>
+</html>
