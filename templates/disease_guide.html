@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Disease Guide | Fruit Disease Detector</title>
     <link rel="stylesheet" href="{{ url_for('static', path='css/styles.css') }}">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍎</text></svg>">
     <script>
         // Apply theme immediately before page renders
         (function() {
@@ -30,8 +33,11 @@
         <aside class="side-panel">
             <div class="panel-header">
                 <div class="app-logo">
-                    <span class="logo-icon">🍎</span>
-                    <h1>Fruit Scanner</h1>
+                    <div class="logo-icon">🍎</div>
+                    <div>
+                        <h1>Fruit Scanner</h1>
+                        <span class="logo-subtitle">AI Disease Detection</span>
+                    </div>
                 </div>
                 <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
                     <span></span><span></span><span></span>
