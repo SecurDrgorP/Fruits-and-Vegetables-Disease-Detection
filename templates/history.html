@@ -6,6 +6,23 @@
     <title>Prediction History | Fruit Disease Detector</title>
     <link rel="stylesheet" href="{{ url_for('static', path='css/styles.css') }}">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <script>
+        // Apply theme immediately before page renders
+        (function() {
+            try {
+                const savedSettings = JSON.parse(localStorage.getItem('appSettings') || '{}');
+                const theme = savedSettings.theme || 'light';
+                if (theme === 'auto') {
+                    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+                } else {
+                    document.documentElement.setAttribute('data-theme', theme);
+                }
+            } catch (e) {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        })();
+    </script>
 </head>
 <body>
     <div class="app-wrapper">

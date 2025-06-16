@@ -1,4 +1,37 @@
+// Apply theme immediately when script loads (before DOM is ready)
+(function() {
+    function applyThemeImmediate() {
+        try {
+            const savedSettings = JSON.parse(localStorage.getItem('appSettings') || '{}');
+            const theme = savedSettings.theme || 'light';
+            
+            if (theme === 'auto') {
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+            } else {
+                document.documentElement.setAttribute('data-theme', theme);
+            }
+        } catch (e) {
+            // Fallback to light theme if there's an error
+            document.documentElement.setAttribute('data-theme', 'light');
+        }
+    }
+    
+    // Apply theme immediately
+    applyThemeImmediate();
+    
+    // Listen for storage changes from other tabs/windows
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'appSettings') {
+            applyThemeImmediate();
+        }
+    });
+})();
+
 document.addEventListener('DOMContentLoaded', function() {
+    // Apply theme FIRST before anything else
+    applyStoredTheme();
+    
     // DOM Elements
     const fileInput = document.getElementById('fileInput');
     const uploadZone = document.getElementById('uploadZone');

@@ -29,7 +29,9 @@ function initializeEventListeners() {
     const themeSelect = document.getElementById('theme');
     if (themeSelect) {
         themeSelect.addEventListener('change', function() {
-            applyTheme(this.value);
+            const newTheme = this.value;
+            applyTheme(newTheme);
+            saveSettingsToStorage(); // Save immediately when theme changes
         });
     }
     
@@ -101,6 +103,15 @@ function saveSettingsToStorage() {
     };
     
     localStorage.setItem('appSettings', JSON.stringify(settings));
+    
+    // Apply theme immediately
+    applyTheme(settings.theme);
+    
+    // Trigger storage event for other tabs/windows
+    window.dispatchEvent(new StorageEvent('storage', {
+        key: 'appSettings',
+        newValue: JSON.stringify(settings)
+    }));
 }
 
 function getStoredSettings() {
