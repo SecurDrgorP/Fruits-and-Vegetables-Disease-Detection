@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction History | Fruit Disease Detector</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='css/styles.css') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+</head>
+<body>
+    <div class="app-wrapper">
+        <!-- Side panel -->
+        <aside class="side-panel">
+            <div class="panel-header">
+                <div class="app-logo">
+                    <span class="logo-icon">🍎</span>
+                    <h1>Fruit Scanner</h1>
+                </div>
+                <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+            
+            <nav class="panel-nav">
+                <a href="/" class="nav-section">
+                    <span class="nav-icon">📷</span>
+                    <span>Analyze</span>
+                </a>
+                <div class="nav-section active">
+                    <span class="nav-icon">📊</span>
+                    <span>History</span>
+                </div>
+                <a href="/disease-guide" class="nav-section">
+                    <span class="nav-icon">📚</span>
+                    <span>Disease Guide</span>
+                </a>
+                <a href="/settings" class="nav-section">
+                    <span class="nav-icon">⚙️</span>
+                    <span>Settings</span>
+                </a>
+            </nav>
+            
+            <div class="panel-footer">
+                <p>AI-powered pathology detection</p>
+                <small>© 2025 Fruit Scanner</small>
+            </div>
+        </aside>
+        
+        <!-- Main content -->
+        <main class="main-content">
+            <header class="page-header">
+                <h2>Prediction History</h2>
+                <p>View your past disease detection analyses and statistics</p>
+            </header>
+            
+            <!-- Statistics Cards -->
+            <section class="stats-grid">
+                <div class="stat-card card">
+                    <div class="stat-icon">🔬</div>
+                    <div class="stat-info">
+                        <h3>{{ statistics.total_predictions }}</h3>
+                        <p>Total Predictions</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card card">
+                    <div class="stat-icon">📈</div>
+                    <div class="stat-info">
+                        <h3>{{ statistics.avg_confidence }}%</h3>
+                        <p>Average Confidence</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card card">
+                    <div class="stat-icon">📅</div>
+                    <div class="stat-info">
+                        <h3>{{ statistics.recent_predictions }}</h3>
+                        <p>Last 7 Days</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card card">
+                    <div class="stat-icon">🎯</div>
+                    <div class="stat-info">
+                        <h3>{% if statistics.common_diseases %}{{ statistics.common_diseases[0][1] }}{% else %}0{% endif %}</h3>
+                        <p>Most Common</p>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- History Table -->
+            <section class="history-container card">
+                <div class="history-header">
+                    <h3>Recent Predictions</h3>
+                    <div class="history-controls">
+                        <button class="btn-clear" onclick="clearHistory()">Clear History</button>
+                        <button class="btn-export" onclick="exportHistory()">Export</button>
+                    </div>
+                </div>
+                
+                {% if predictions %}
+                <div class="history-table-container">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Image</th>
+                                <th>Model</th>
+                                <th>Prediction</th>
+                                <th>Confidence</th>
+                                <th>File Size</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for prediction in predictions %}
+                            <tr class="history-row" data-id="{{ prediction.id }}">
+                                <td class="date-cell">
+                                    <div class="date-time">
+                                        <span class="date">{{ prediction.timestamp.split(' ')[0] }}</span>
+                                        <span class="time">{{ prediction.timestamp.split(' ')[1].split('.')[0] }}</span>
+                                    </div>
+                                </td>
+                                <td class="image-cell">
+                                    <div class="image-preview">
+                                        <span class="file-icon">🖼️</span>
+                                        <span class="file-name">{{ prediction.file_name }}</span>
+                                    </div>
+                                </td>
+                                <td class="model-cell">
+                                    <span class="model-badge">{{ prediction.model_name }}</span>
+                                </td>
+                                <td class="prediction-cell">
+                                    <div class="prediction-result">
+                                        <span class="disease-name">{{ prediction.predicted_class }}</span>
+                                        {% if 'Healthy' in prediction.predicted_class %}
+                                            <span class="status-badge healthy">Healthy</span>
+                                        {% else %}
+                                            <span class="status-badge diseased">Disease Detected</span>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td class="confidence-cell">
+                                    <div class="confidence-bar">
+                                        <div class="confidence-fill" style="width: {{ prediction.confidence|safe_float }}%"></div>
+                                        <span class="confidence-text">{{ prediction.confidence|safe_float }}%</span>
+                                    </div>
+                                </td>
+                                <td class="size-cell">{{ prediction.file_size }}</td>
+                                <td class="actions-cell">
+                                    <button class="action-btn view-btn" onclick="viewPrediction({{ prediction.id }})">
+                                        <span>👁️</span>
+                                    </button>
+                                    <button class="action-btn delete-btn" onclick="deletePrediction({{ prediction.id }})">
+                                        <span>🗑️</span>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="pagination">
+                    {% if current_page > 1 %}
+                        <a href="/history?page={{ current_page - 1 }}" class="page-btn prev">Previous</a>
+                    {% endif %}
+                    
+                    <span class="page-info">Page {{ current_page }}</span>
+                    
+                    {% if has_next %}
+                        <a href="/history?page={{ current_page + 1 }}" class="page-btn next">Next</a>
+                    {% endif %}
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">📊</div>
+                    <h3>No Predictions Yet</h3>
+                    <p>Start analyzing images to see your prediction history here.</p>
+                    <a href="/" class="btn-primary">Start Analyzing</a>
+                </div>
+                {% endif %}
+            </section>
+        </main>
+    </div>
+    
+    <!-- Prediction Detail Modal -->
+    <div class="modal-overlay" id="predictionModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Prediction Details</h3>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Content will be loaded dynamically -->
+            </div>
+        </div>
+    </div>
+    
+    <script src="{{ url_for('static', path='js/scripts.js') }}"></script>
+    <script src="{{ url_for('static', path='js/history.js') }}"></script>
+</body>
+</html>

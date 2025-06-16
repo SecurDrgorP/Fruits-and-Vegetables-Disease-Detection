@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings | Fruit Disease Detector</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='css/styles.css') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+</head>
+<body>
+    <div class="app-wrapper">
+        <!-- Side panel -->
+        <aside class="side-panel">
+            <div class="panel-header">
+                <div class="app-logo">
+                    <span class="logo-icon">🍎</span>
+                    <h1>Fruit Scanner</h1>
+                </div>
+                <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+            
+            <nav class="panel-nav">
+                <a href="/" class="nav-section">
+                    <span class="nav-icon">📷</span>
+                    <span>Analyze</span>
+                </a>
+                <a href="/history" class="nav-section">
+                    <span class="nav-icon">📊</span>
+                    <span>History</span>
+                </a>
+                <a href="/disease-guide" class="nav-section">
+                    <span class="nav-icon">📚</span>
+                    <span>Disease Guide</span>
+                </a>
+                <div class="nav-section active">
+                    <span class="nav-icon">⚙️</span>
+                    <span>Settings</span>
+                </div>
+            </nav>
+            
+            <div class="panel-footer">
+                <p>AI-powered pathology detection</p>
+                <small>© 2025 Fruit Scanner</small>
+            </div>
+        </aside>
+        
+        <!-- Main content -->
+        <main class="main-content">
+            <header class="page-header">
+                <h2>Settings</h2>
+                <p>Configure your application preferences and model settings</p>
+            </header>
+            
+            <!-- General Settings -->
+            <section class="settings-section card">
+                <h3>General Settings</h3>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <label>Default Model</label>
+                        <p>Choose the default AI model for disease detection</p>
+                    </div>
+                    <div class="setting-control">
+                        <select id="defaultModel" class="setting-select">
+                            {% for model in models %}
+                                <option value="{{ model }}">{{ model }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <label>Confidence Threshold</label>
+                        <p>Minimum confidence level for disease predictions</p>
+                    </div>
+                    <div class="setting-control">
+                        <div class="slider-container">
+                            <input type="range" id="confidenceThreshold" min="0" max="100" value="50" class="setting-slider">
+                            <span class="slider-value">50%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <label>Auto-save Results</label>
+                        <p>Automatically save analysis results to history</p>
+                    </div>
+                    <div class="setting-control">
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="autoSave" checked>
+                            <label for="autoSave"></label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <label>Show Heatmap by Default</label>
+                        <p>Display heatmap view automatically after analysis</p>
+                    </div>
+                    <div class="setting-control">
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="showHeatmap">
+                            <label for="showHeatmap"></label>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Display Settings -->
+            <section class="settings-section card">
+                <h3>Display Settings</h3>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <label>Theme</label>
+                        <p>Choose your preferred color theme</p>
+                    </div>
+                    <div class="setting-control">
+                        <select id="theme" class="setting-select">
+                            <option value="light">Light</option>
+                            <option value="dark">Dark</option>
+                            <option value="auto">Auto</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <label>Language</label>
+                        <p>Select your preferred language</p>
+                    </div>
+                    <div class="setting-control">
+                        <select id="language" class="setting-select">
+                            <option value="en">English</option>
+                            <option value="es">Español</option>
+                            <option value="fr">Français</option>
+                            <option value="de">Deutsch</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <label>Animation Speed</label>
+                        <p>Control the speed of UI animations</p>
+                    </div>
+                    <div class="setting-control">
+                        <select id="animationSpeed" class="setting-select">
+                            <option value="slow">Slow</option>
+                            <option value="normal" selected>Normal</option>
+                            <option value="fast">Fast</option>
+                            <option value="none">None</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Data & Privacy -->
+            <section class="settings-section card">
+                <h3>Data & Privacy</h3>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <label>Data Retention</label>
+                        <p>How long to keep prediction history</p>
+                    </div>
+                    <div class="setting-control">
+                        <select id="dataRetention" class="setting-select">
+                            <option value="7">7 days</option>
+                            <option value="30" selected>30 days</option>
+                            <option value="90">90 days</option>
+                            <option value="365">1 year</option>
+                            <option value="forever">Forever</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <label>Analytics</label>
+                        <p>Help improve the app by sharing anonymous usage data</p>
+                    </div>
+                    <div class="setting-control">
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="analytics" checked>
+                            <label for="analytics"></label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <label>Clear All Data</label>
+                        <p>Remove all prediction history and cached data</p>
+                    </div>
+                    <div class="setting-control">
+                        <button class="btn-danger" onclick="clearAllData()">Clear Data</button>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Model Information -->
+            <section class="settings-section card">
+                <h3>Model Information</h3>
+                
+                <div class="model-grid">
+                    {% for model in models %}
+                    <div class="model-card">
+                        <div class="model-header">
+                            <h4>{{ model }}</h4>
+                            <span class="model-status active">Active</span>
+                        </div>
+                        <div class="model-details">
+                            <div class="model-stat">
+                                <span class="stat-label">Version:</span>
+                                <span class="stat-value">1.0.0</span>
+                            </div>
+                            <div class="model-stat">
+                                <span class="stat-label">Accuracy:</span>
+                                <span class="stat-value">94.2%</span>
+                            </div>
+                            <div class="model-stat">
+                                <span class="stat-label">Last Updated:</span>
+                                <span class="stat-value">2024-12-15</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+            
+            <!-- Export/Import -->
+            <section class="settings-section card">
+                <h3>Export & Import</h3>
+                
+                <div class="export-import-grid">
+                    <div class="export-section">
+                        <h4>Export Settings</h4>
+                        <p>Download your current settings configuration</p>
+                        <button class="btn-secondary" onclick="exportSettings()">
+                            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none">
+                                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-15"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            Export Settings
+                        </button>
+                    </div>
+                    
+                    <div class="import-section">
+                        <h4>Import Settings</h4>
+                        <p>Restore settings from a configuration file</p>
+                        <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importSettings(this)">
+                        <button class="btn-secondary" onclick="document.getElementById('importFile').click()">
+                            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none">
+                                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                            Import Settings
+                        </button>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Save Settings -->
+            <div class="settings-actions">
+                <button class="btn-primary" onclick="saveSettings()">Save Settings</button>
+                <button class="btn-secondary" onclick="resetSettings()">Reset to Defaults</button>
+            </div>
+        </main>
+    </div>
+    
+    <script src="{{ url_for('static', path='js/scripts.js') }}"></script>
+    <script src="{{ url_for('static', path='js/settings.js') }}"></script>
+</body>
+</html>

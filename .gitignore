@@ -16,5 +16,7 @@ VENV/
 *.sublime-workspace
 *.sublime-project
 
+predictions.db
+
 Notes.txt
 .gitignore

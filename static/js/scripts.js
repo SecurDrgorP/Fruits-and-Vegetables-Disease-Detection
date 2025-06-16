@@ -153,6 +153,17 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    // Initialize navigation
+    initializeNavigation();
+    
+    // Initialize settings if on settings page
+    if (window.location.pathname === '/settings') {
+        loadUserSettings();
+    }
+    
+    // Initialize theme
+    applyStoredTheme();
+    
     // Helper function to format file size
     function formatFileSize(bytes) {
         if (bytes === 0) return '0 Bytes';
@@ -160,5 +171,100 @@ document.addEventListener('DOMContentLoaded', function() {
         const sizes = ['Bytes', 'KB', 'MB', 'GB'];
         const i = Math.floor(Math.log(bytes) / Math.log(k));
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    // Navigation functionality
+    function initializeNavigation() {
+        // Update active navigation based on current page
+        const currentPath = window.location.pathname;
+        const navSections = document.querySelectorAll('.nav-section');
+        
+        navSections.forEach(section => {
+            section.classList.remove('active');
+            
+            const link = section.getAttribute('href') || section.querySelector('a')?.getAttribute('href');
+            if (link === currentPath || (currentPath === '/' && !link)) {
+                section.classList.add('active');
+            }
+        });
+        
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const sidePanel = document.querySelector('.side-panel');
+            const menuToggle = document.getElementById('menuToggle');
+            
+            if (sidePanel && !sidePanel.contains(event.target) && !menuToggle.contains(event.target)) {
+                sidePanel.classList.remove('open');
+            }
+        });
+    }
+    
+    // Theme functionality
+    function applyStoredTheme() {
+        const savedSettings = JSON.parse(localStorage.getItem('appSettings') || '{}');
+        const theme = savedSettings.theme || 'light';
+        
+        document.documentElement.setAttribute('data-theme', theme);
+        
+        if (theme === 'auto') {
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+        }
+    }
+    
+    // Load user settings for consistent behavior
+    function loadUserSettings() {
+        const savedSettings = JSON.parse(localStorage.getItem('appSettings') || '{}');
+        
+        // Apply auto-save setting
+        if (savedSettings.autoSave === false) {
+            // Disable auto-save functionality
+            window.autoSaveEnabled = false;
+        }
+        
+        // Apply show heatmap setting
+        if (savedSettings.showHeatmap === true) {
+            // Auto-show heatmap after analysis
+            window.showHeatmapByDefault = true;
+        }
+        
+        // Apply confidence threshold
+        if (savedSettings.confidenceThreshold) {
+            window.confidenceThreshold = parseInt(savedSettings.confidenceThreshold);
+        }
+    }
+    
+    // Enhanced prediction result handling
+    function handlePredictionResult() {
+        // Auto-show heatmap if setting is enabled
+        if (window.showHeatmapByDefault && btnHeatmap && !btnHeatmap.classList.contains('active')) {
+            btnHeatmap.click();
+        }
+        
+        // Check confidence threshold
+        const confidenceElement = document.querySelector('.meter-value');
+        if (confidenceElement && window.confidenceThreshold) {
+            const confidence = parseFloat(confidenceElement.textContent);
+            if (confidence < window.confidenceThreshold) {
+                showLowConfidenceWarning(confidence);
+            }
+        }
+    }
+    
+    function showLowConfidenceWarning(confidence) {
+        const warning = document.createElement('div');
+        warning.className = 'confidence-warning';
+        warning.innerHTML = `
+            <div class="warning-icon">⚠️</div>
+            <div class="warning-text">
+                <strong>Low Confidence Warning</strong>
+                <p>The AI model has ${confidence}% confidence in this prediction. Consider retaking the image with better lighting or angle.</p>
+            </div>
+        `;
+        
+        const resultsContainer = document.getElementById('resultsContainer');
+        if (resultsContainer) {
+            resultsContainer.insertBefore(warning, resultsContainer.firstChild);
+        }
     }
 });

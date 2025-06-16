@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disease Guide | Fruit Disease Detector</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='css/styles.css') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+</head>
+<body>
+    <div class="app-wrapper">
+        <!-- Side panel -->
+        <aside class="side-panel">
+            <div class="panel-header">
+                <div class="app-logo">
+                    <span class="logo-icon">🍎</span>
+                    <h1>Fruit Scanner</h1>
+                </div>
+                <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+            
+            <nav class="panel-nav">
+                <a href="/" class="nav-section">
+                    <span class="nav-icon">📷</span>
+                    <span>Analyze</span>
+                </a>
+                <a href="/history" class="nav-section">
+                    <span class="nav-icon">📊</span>
+                    <span>History</span>
+                </a>
+                <div class="nav-section active">
+                    <span class="nav-icon">📚</span>
+                    <span>Disease Guide</span>
+                </div>
+                <a href="/settings" class="nav-section">
+                    <span class="nav-icon">⚙️</span>
+                    <span>Settings</span>
+                </a>
+            </nav>
+            
+            <div class="panel-footer">
+                <p>AI-powered pathology detection</p>
+                <small>© 2025 Fruit Scanner</small>
+            </div>
+        </aside>
+        
+        <!-- Main content -->
+        <main class="main-content">
+            <header class="page-header">
+                <h2>Disease Guide</h2>
+                <p>Comprehensive information about fruit and vegetable diseases</p>
+            </header>
+            
+            <!-- Search Section -->
+            <section class="search-container card">
+                <form method="get" action="/disease-guide" class="search-form">
+                    <div class="search-input-wrapper">
+                        <input type="text" name="search" placeholder="Search diseases..." 
+                               value="{{ search_query }}" class="search-input">
+                        <button type="submit" class="search-btn">
+                            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                        </button>
+                    </div>
+                </form>
+            </section>
+            
+            <!-- Disease Categories -->
+            <section class="disease-categories">
+                <div class="category-filter">
+                    <button class="filter-btn active" data-filter="all">All Diseases</button>
+                    <button class="filter-btn" data-filter="Apple">Apple</button>
+                    <button class="filter-btn" data-filter="Citrus">Citrus</button>
+                    <button class="filter-btn" data-filter="Tomato">Tomato</button>
+                    <button class="filter-btn" data-filter="Olive">Olive</button>
+                </div>
+            </section>
+            
+            <!-- Disease Cards -->
+            <section class="diseases-grid">
+                {% if diseases %}
+                    {% for disease in diseases %}
+                    <div class="disease-card card" data-plant="{{ disease.affected_plants }}">
+                        <div class="disease-header">
+                            <div class="disease-icon">
+                                {% if 'Apple' in disease.disease_name %}🍎
+                                {% elif 'Citrus' in disease.disease_name %}🍊
+                                {% elif 'Tomato' in disease.disease_name %}🍅
+                                {% elif 'Olive' in disease.disease_name %}🫒
+                                {% else %}🌱
+                                {% endif %}
+                            </div>
+                            <div class="disease-title">
+                                <h3>{{ disease.disease_name }}</h3>
+                                <span class="severity-badge severity-{{ disease.severity_level.lower() }}">
+                                    {{ disease.severity_level }} Risk
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="disease-content">
+                            <p class="disease-description">{{ disease.description }}</p>
+                            
+                            <div class="disease-details">
+                                <div class="detail-section">
+                                    <h4>🔍 Symptoms</h4>
+                                    <p>{{ disease.symptoms }}</p>
+                                </div>
+                                
+                                <div class="detail-section">
+                                    <h4>⚠️ Causes</h4>
+                                    <p>{{ disease.causes }}</p>
+                                </div>
+                                
+                                <div class="detail-section">
+                                    <h4>💊 Treatment</h4>
+                                    <p>{{ disease.treatment }}</p>
+                                </div>
+                                
+                                <div class="detail-section">
+                                    <h4>🛡️ Prevention</h4>
+                                    <p>{{ disease.prevention }}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="disease-footer">
+                                <span class="affected-plants">
+                                    <strong>Affects:</strong> {{ disease.affected_plants }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <div class="empty-icon">🔍</div>
+                        <h3>No Diseases Found</h3>
+                        {% if search_query %}
+                            <p>No diseases match your search for "{{ search_query }}".</p>
+                            <a href="/disease-guide" class="btn-primary">View All Diseases</a>
+                        {% else %}
+                            <p>Disease information is being loaded...</p>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </section>
+            
+            <!-- Quick Reference -->
+            <section class="quick-reference card">
+                <h3>Quick Reference</h3>
+                <div class="reference-grid">
+                    <div class="reference-item">
+                        <div class="ref-icon healthy">🟢</div>
+                        <div class="ref-content">
+                            <h4>Healthy Plants</h4>
+                            <p>Regular monitoring and preventive care</p>
+                        </div>
+                    </div>
+                    
+                    <div class="reference-item">
+                        <div class="ref-icon low">🟡</div>
+                        <div class="ref-content">
+                            <h4>Low Risk</h4>
+                            <p>Minor issues, easily treatable</p>
+                        </div>
+                    </div>
+                    
+                    <div class="reference-item">
+                        <div class="ref-icon medium">🟠</div>
+                        <div class="ref-content">
+                            <h4>Medium Risk</h4>
+                            <p>Requires prompt attention and treatment</p>
+                        </div>
+                    </div>
+                    
+                    <div class="reference-item">
+                        <div class="ref-icon high">🔴</div>
+                        <div class="ref-content">
+                            <h4>High Risk</h4>
+                            <p>Immediate action required, may spread</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <script src="{{ url_for('static', path='js/scripts.js') }}"></script>
+    <script src="{{ url_for('static', path='js/disease-guide.js') }}"></script>
+</body>
+</html>
