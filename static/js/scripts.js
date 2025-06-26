@@ -32,10 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Apply theme FIRST before anything else
     applyStoredTheme();
     
-    // Initialize enhanced UI features
-    initializeEnhancedUI();
-    
-    // DOM Elements
+    // DOM Elements - Declare these FIRST
     const fileInput = document.getElementById('fileInput');
     const uploadZone = document.getElementById('uploadZone');
     const fileInfo = document.getElementById('fileInfo');
@@ -49,6 +46,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const resultImage = document.getElementById('resultImage');
     const btnDownload = document.getElementById('btnDownload');
     const btnNewScan = document.getElementById('btnNewScan');
+
+
+
+    // Initialize enhanced UI features AFTER DOM elements are declared
+    initializeEnhancedUI();
 
     // Enhanced UI initialization
     function initializeEnhancedUI() {
@@ -304,8 +306,15 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Toggle between original and heatmap views
+
+    btnHeatmap.addEventListener('click', function() {
+        console.log('Switching to heatmap view');
+    });
+
+
     if (btnOriginal && btnHeatmap && resultImage) {
         btnOriginal.addEventListener('click', function() {
+            console.log('Switching to original image view');
             const originalSrc = resultImage.getAttribute('src');
             if (originalSrc && originalSrc !== '#') {
                 btnOriginal.classList.add('active');
