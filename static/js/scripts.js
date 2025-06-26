@@ -162,7 +162,8 @@ document.addEventListener('DOMContentLoaded', function() {
     function addParallaxEffects() {
         window.addEventListener('scroll', () => {
             const scrolled = window.pageYOffset;
-            const parallaxElements = document.querySelectorAll('.panel-header');
+            // Remove parallax effect from panel-header to keep it fixed
+            const parallaxElements = document.querySelectorAll('.parallax-element');
             
             parallaxElements.forEach(element => {
                 const speed = 0.5;
